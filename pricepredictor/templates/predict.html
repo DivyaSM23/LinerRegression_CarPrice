@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Price Predictor</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .navbar {
+        background: rgba(0, 0, 0, 0.8); /* Transparent background with slight dark shade */
+        padding: 0.2rem 2rem;
+        transition: background-color 0.3s ease;
+    }
+    
+    .navbar:hover {
+        background-color: rgba(0, 0, 0, 0.7); /* Darkens on hover */
+    }
+
+    .navbar-brand {
+        font-size: 1.8rem;
+        font-weight: 500;
+        color: #ffffff;
+    }
+
+    .nav-link {
+        font-size: 1.1rem;
+        color: #ffffff;
+        margin-right: 20px;
+        text-transform: uppercase;
+        font-weight: 500;
+        transition: color 0.3s;
+    }
+
+    .nav-link:hover {
+        color: #00bcd4; /* Highlight on hover */
+        text-decoration: underline;
+    }
+
+    .navbar-toggler-icon {
+        background-color: #ffffff; /* White color for the toggler icon */
+    }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #1212129c;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+        /* Section styling */
+        .hero-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #121212;
+        }
+        .form-container {
+            flex: 1;
+            padding: 30px;
+            margin: 0px 0px 0px 30px;
+            border-radius: 15px;
+            background-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        .form-container h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group input, .form-group select {
+            border-radius: 10px;
+            padding: 10px;
+            background-color: #222;
+            border: 1px solid #444;
+            color: #fff;
+        }
+        .form-group label {
+            color: #b0bec5;
+        }
+        .btn-success {
+            background-color: #00bcd4;
+            border: none;
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 1.2rem;
+        }
+        .btn-success:hover {
+            background-color: #0097a7;
+        }
+        .image-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            height: 100%;
+        }
+        .slanted-image {
+            background: url('https://www.shutterstock.com/image-photo/electric-cars-suvs-parked-row-600nw-1380375332.jpg') no-repeat center center;
+            background-size: cover;
+            width: 100%;
+            height: 100%;
+            clip-path: polygon(25% 0, 100% 0, 100% 100%, 0% 100%);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        /* Price display */
+        .predicted-price {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #333;
+            color: #fff;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#">Car Price Predictor</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/predict">Predict Price</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="form-container">
+            <h1>Car Price Prediction</h1>
+            <p class="text-center text-muted">
+                Enter your car details below, and we'll predict the best price for you.
+            </p>
+
+            <form action="/predict" method="post">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="Car_Name">Car Name:</label>
+                        <select id="Car_Name" name="Car_Name" class="form-control">
+                            {% for car in car_names %}
+                            <option value="{{ car }}">{{ car }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="Year">Year:</label>
+                        <input type="number" id="Year" name="Year" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="Present_Price">Present Price (in Lakhs):</label>
+                        <input type="number" step="0.01" id="Present_Price" name="Present_Price" class="form-control" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="Kms_Driven">Kms Driven:</label>
+                        <input type="number" id="Kms_Driven" name="Kms_Driven" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="Fuel_Type">Fuel Type:</label>
+                        <select id="Fuel_Type" name="Fuel_Type" class="form-control">
+                            {% for fuel in fuel_types %}
+                            <option value="{{ fuel }}">{{ fuel }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="Seller_Type">Seller Type:</label>
+                        <select id="Seller_Type" name="Seller_Type" class="form-control">
+                            {% for seller in seller_types %}
+                            <option value="{{ seller }}">{{ seller }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="Transmission">Transmission:</label>
+                        <select id="Transmission" name="Transmission" class="form-control">
+                            {% for trans in transmissions %}
+                            <option value="{{ trans }}">{{ trans }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="Owner">Owner:</label>
+                        <select id="Owner" name="Owner" class="form-control">
+                            {% for owner in owners %}
+                            <option value="{{ owner }}">{{ owner }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-success btn-block">Predict</button>
+            </form>
+
+            {% if predicted_price %}
+            <div class="predicted-price">
+                <h4>Predicted Price: ₹{{ predicted_price }}</h4>
+            </div>
+            {% endif %}
+
+            {% if error %}
+            <div class="alert alert-danger text-center mt-4">
+                <h4>Error: {{ error }}</h4>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="image-container">
+            <div class="slanted-image"></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
